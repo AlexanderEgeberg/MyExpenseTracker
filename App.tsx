@@ -1,24 +1,27 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, Button} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Button, Text, View} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 
-GoogleSignin.configure({
-  webClientId:
-    '738388872687-r5dv33bc6u760ugd7agiittq6qnejhu4.apps.googleusercontent.com',
-});
-
 function App() {
-  // Set an initializing state whilst Firebase connects
+  GoogleSignin.configure({
+    webClientId:
+      '738388872687-r5dv33bc6u760ugd7agiittq6qnejhu4.apps.googleusercontent.com',
+  });
+
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
 
-  // Handle user state changes
-  const onAuthStateChanged = (uxser: any) => {
-    setUser(uxser);
+  function onAuthStateChanged(user) {
+    setUser(user);
     if (initializing) {
       setInitializing(false);
     }
+  }
+  const logOut = () => {
+    auth()
+      .signOut()
+      .then(() => console.log('User signed out!'));
   };
 
   useEffect(() => {
@@ -26,41 +29,38 @@ function App() {
     return subscriber; // unsubscribe on unmount
   }, []);
 
-  async function onGoogleButtonPress() {
-    // Get the users ID token
+  const sigInwithGoogleAsync = async () => {
     const {idToken} = await GoogleSignin.signIn();
 
-    // Create a Google credential with the token
     const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 
-    // Sign-in the user with the credential
-    return auth().signInWithCredential(googleCredential);
-  }
+    const user_sign_in = auth().signInWithCredential(googleCredential);
 
-  function GoogleSignIn() {
-    return (
-      <Button
-        title="Google Sign-In"
-        onPress={() =>
-          onGoogleButtonPress().then(() =>
-            console.log('Signed in with Google!'),
-          )
-        }
-      />
-    );
-  }
+    user_sign_in
+      .then(user => {
+        console.log(user);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
 
   if (initializing) {
     return null;
   }
 
   if (!user) {
-    return <View>{GoogleSignIn()}</View>;
+    return (
+      <View>
+        <Button title="Google Sign-In" onPress={sigInwithGoogleAsync} />
+      </View>
+    );
   }
 
   return (
     <View>
-      <Text>Welcome {user.email}</Text>
+      <Text>Welcome {user.displayName.substring(0, 9)}</Text>
+      <Button title="Log out" onPress={logOut} />
     </View>
   );
 }
