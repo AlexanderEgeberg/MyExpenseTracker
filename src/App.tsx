@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {Button} from 'react-native-paper';
 
 function App() {
   GoogleSignin.configure({
@@ -27,7 +28,7 @@ function App() {
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
-  }, []);
+  });
 
   const sigInwithGoogleAsync = async () => {
     const {idToken} = await GoogleSignin.signIn();
@@ -52,7 +53,7 @@ function App() {
   if (!user) {
     return (
       <View>
-        <Button title="Google Sign-In" onPress={sigInwithGoogleAsync} />
+        <Button onPress={sigInwithGoogleAsync}>Google Sign-In</Button>
       </View>
     );
   }
@@ -60,7 +61,7 @@ function App() {
   return (
     <View>
       <Text>Welcome {user.displayName.substring(0, 9)}</Text>
-      <Button title="Log out" onPress={logOut} />
+      <Button onPress={logOut}>Log out</Button>
     </View>
   );
 }
