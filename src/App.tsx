@@ -1,8 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {Button} from 'react-native-paper';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { Button } from 'react-native-paper';
+import Layout from './Layout/Layout';
+import HomePage from './screens/HomePage';
 
 function App() {
   GoogleSignin.configure({
@@ -11,19 +13,14 @@ function App() {
   });
 
   const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
+  const [user, setUser] = useState<any>();
 
-  function onAuthStateChanged(user) {
-    setUser(user);
+  function onAuthStateChanged(xuser: any) {
+    setUser(xuser);
     if (initializing) {
       setInitializing(false);
     }
   }
-  const logOut = () => {
-    auth()
-      .signOut()
-      .then(() => console.log('User signed out!'));
-  };
 
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
@@ -31,15 +28,15 @@ function App() {
   });
 
   const sigInwithGoogleAsync = async () => {
-    const {idToken} = await GoogleSignin.signIn();
+    const { idToken } = await GoogleSignin.signIn();
 
     const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 
     const user_sign_in = auth().signInWithCredential(googleCredential);
 
     user_sign_in
-      .then(user => {
-        console.log(user);
+      .then(userx => {
+        console.log(userx);
       })
       .catch(error => {
         console.log(error);
@@ -59,10 +56,9 @@ function App() {
   }
 
   return (
-    <View>
-      <Text>Welcome {user.displayName.substring(0, 9)}</Text>
-      <Button onPress={logOut}>Log out</Button>
-    </View>
+    <Layout user={user}>
+      <HomePage />
+    </Layout>
   );
 }
 

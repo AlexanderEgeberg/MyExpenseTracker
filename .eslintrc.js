@@ -11,6 +11,12 @@ module.exports = {
         'no-shadow': 'off',
         'no-undef': 'off',
         'unused-imports/no-unused-imports': 'error',
+        'prettier/prettier': [
+          'error',
+          {
+            endOfLine: 'auto',
+          },
+        ],
       },
     },
   ],
